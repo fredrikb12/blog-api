@@ -11,6 +11,7 @@ const PostSchema = new Schema(
       ref: "User",
       maxLength: 2000,
     },
+    published: { type: Boolean, required: true },
     createdAt: Number,
     updatedAt: Number,
     comments: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
