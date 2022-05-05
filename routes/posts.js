@@ -22,4 +22,12 @@ router.delete("/:postId", (req, res, next) => {
   res.send(`NOT IMPLEMENTED: /posts/${req.params.postId} DELETE`);
 });
 
+router.post("/:postId/comments", (req, res, next) => {
+  res.send(`NOT IMPLEMENTED: /posts/${req.params.postId}/comments POST`);
+});
+
+router.get("/:postId/comments", (req, res, next) => {
+  res.send(`NOT IMPLEMENTED: /posts/${req.params.postId}/comments GET`);
+});
+
 module.exports = router;
