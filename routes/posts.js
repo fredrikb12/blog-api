@@ -1,33 +1,20 @@
 const express = require("express");
+const postsController = require("../controllers/postController");
 
 const router = express.Router();
 
-router.post("/", (req, res, next) => {
-  res.send("NOT IMPLEMENTED: /posts POST");
-});
+router.post("/", postsController.posts_POST);
 
-router.get("/", (req, res, next) => {
-  res.send("NOT IMPLEMENTED: /posts GET");
-});
+router.get("/", postsController.posts_GET);
 
-router.get("/:postId", (req, res, next) => {
-  res.send(`NOT IMPLEMENTED: /posts/${req.params.postId} GET`);
-});
+router.get("/:postId", postsController.posts_postId_GET);
 
-router.put("/:postId", (req, res, next) => {
-  res.send(`NOT IMPLEMENTED: /posts/${req.params.postId} PUT`);
-});
+router.put("/:postId", postsController.posts_postId_PUT);
 
-router.delete("/:postId", (req, res, next) => {
-  res.send(`NOT IMPLEMENTED: /posts/${req.params.postId} DELETE`);
-});
+router.delete("/:postId", postsController.posts_postId_DELETE);
 
-router.post("/:postId/comments", (req, res, next) => {
-  res.send(`NOT IMPLEMENTED: /posts/${req.params.postId}/comments POST`);
-});
+router.post("/:postId/comments", postsController.posts_postId_comments_POST);
 
-router.get("/:postId/comments", (req, res, next) => {
-  res.send(`NOT IMPLEMENTED: /posts/${req.params.postId}/comments GET`);
-});
+router.get("/:postId/comments", postsController.posts_postId_comments_GET);
 
 module.exports = router;
