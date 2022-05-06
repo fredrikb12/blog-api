@@ -2,6 +2,9 @@ const User = require("../models/user");
 const async = require("async");
 const { body, validationResult } = require("express-validator");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const passport = require("passport");
+require("dotenv").config();
 
 exports.signup_POST = [
   body("first_name", "First name must be between 3 and 30 characters long.")
@@ -71,4 +74,10 @@ exports.signup_POST = [
   },
 ];
 
-exports.signin_POST = (req, res, next) => {};
+exports.signin_POST = (req, res, next) => {
+  res.send("SIGNIN POST NOT IMPLEMENTED");
+};
+
+exports.posts_POST = (req, res, next) => {
+  res.send("POSTS POST NOT IMPLEMENTED");
+};
