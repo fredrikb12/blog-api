@@ -7,7 +7,6 @@ const PostSchema = new Schema(
     text: { type: String, required: true, maxLength: 2000 },
     author: {
       type: Schema.Types.ObjectId,
-      required: true,
       ref: "User",
     },
     published: { type: Boolean, required: true },

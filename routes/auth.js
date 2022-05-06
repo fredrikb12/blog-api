@@ -1,12 +1,11 @@
 const express = require("express");
+const authController = require("../controllers/authController");
 
 const router = express.Router();
 
-router.post("/sign-up", (req, res, next) => {
-  res.send("NOT IMPLEMENTED: /sign-up POST");
-});
+router.post("/signup", authController.signup_POST);
 
-router.post("/sign-in", (req, res, next) => {
+router.post("/signin", (req, res, next) => {
   res.send("NOT IMPLEMENTED: /sign-in POST");
 });
 

@@ -6,6 +6,8 @@ const logger = require("morgan");
 
 const indexRouter = require("./routes/index");
 const postsRouter = require("./routes/posts");
+const authRouter = require("./routes/auth");
+
 const mongoose = require("mongoose");
 require("dotenv").config();
 
@@ -31,6 +33,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/", indexRouter);
 app.use("/posts", postsRouter);
+app.use("/auth", authRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
