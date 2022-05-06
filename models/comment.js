@@ -12,3 +12,5 @@ const CommentSchema = new Schema(
     timestamps: { currentTime: () => Date.now() },
   }
 );
+
+module.exports = mongoose.model("Comment", CommentSchema);
