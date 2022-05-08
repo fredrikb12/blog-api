@@ -5,6 +5,8 @@ const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const passport = require("passport");
 
+const jwtAuth = require("./jwtAuth");
+
 const indexRouter = require("./routes/index");
 const postsRouter = require("./routes/posts");
 const authRouter = require("./routes/auth");
@@ -32,10 +34,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
-app.use(passport.initialize());
 
 app.use("/", indexRouter);
 app.use("/posts", postsRouter);
+app.use("/auth/posts", jwtAuth.jwtAuth, authRouter);
 app.use("/auth", authRouter);
 
 // catch 404 and forward to error handler
