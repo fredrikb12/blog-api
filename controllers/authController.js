@@ -4,6 +4,7 @@ const { body, validationResult } = require("express-validator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const passport = require("passport");
+const jwtAuth = require("../jwtAuth");
 require("dotenv").config();
 
 exports.signup_POST = [
@@ -60,11 +61,12 @@ exports.signup_POST = [
               username: req.body.username,
               password: hashedPassword,
               user_type: "writer",
-            }).save((err) => {
+            }).save((err, user) => {
               if (err) return next(err);
-              res.json({
+              res.cookie("token", genToken(user), { httpOnly: true }).json({
                 status: 200,
                 message: "User created.",
+                user: user._id,
               });
             });
           });
@@ -75,9 +77,51 @@ exports.signup_POST = [
 ];
 
 exports.signin_POST = (req, res, next) => {
-  res.send("SIGNIN POST NOT IMPLEMENTED");
+  passport.authenticate("local", { session: false }, (err, user, info) => {
+    if (err) return next(err);
+    if (!user) {
+      return res.status(400).json({
+        message: "Something is not right",
+        user: user,
+      });
+    } else {
+      req.login(user, { session: false }, (err) => {
+        if (err) {
+          return next(err);
+        }
+        return res
+          .cookie("token", genToken(user), { httpOnly: true })
+          .json({ message: "Login successful!", user: user._id });
+      });
+    }
+  })(req, res, next);
 };
 
 exports.posts_POST = (req, res, next) => {
-  res.send("POSTS POST NOT IMPLEMENTED");
+  if (jwtAuth.tokenNeedsUpdate(req, res, next)) {
+    return res
+      .cookie("token", genToken({ first_name: req.iss, _id: req._id }), {
+        httpOnly: true,
+      })
+      .json({ message: "Working?", user: req._id, cookieStatus: "Updated" });
+  } else {
+    res.json({
+      message: "Working?",
+      user: req._id,
+      cookieStatus: "Not updated",
+    });
+  }
 };
+
+const genToken = function (user) {
+  return jwt.sign(
+    {
+      iss: user.first_name,
+      _id: user._id,
+    },
+    process.env.JWT_SECRET,
+    { expiresIn: "10s" }
+  );
+};
+
+exports.genToken = genToken;
