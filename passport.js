@@ -5,6 +5,7 @@ const bcrypt = require("bcryptjs");
 const passportJWT = require("passport-jwt");
 const JWTStrategy = passportJWT.Strategy;
 const ExtractJWT = passportJWT.ExtractJwt;
+const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 passport.use(
@@ -30,23 +31,23 @@ passport.use(
 /*passport.use(
   new JWTStrategy(
     {
-      jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJWT.fromExtractors([
+        (request) => {
+          let token = request?.cookies["token"];
+          if (!token) return null;
+          const data = jwt.verify(token, process.env.JWT_SECRET);
+          return data;
+        },
+      ]),
       secretOrKey: process.env.JWT_SECRET,
     },
-    function (jwtPayload, done) {
-      User.findOne({ id: jwtPayload._id }).exec(function (err, user) {
-        console.log(user);
-        if (err) {
-          console.log(err);
-          return done(err, null);
-        } else if (user) {
-          console.log(user);
-          return done(null, user);
-        } else {
-          console.log("test");
-          return done(null, false);
-        }
-      });
+    async function (jwtPayload, done) {
+      try {
+        const user = await User.findById(jwtPayload.sub);
+        return done(null, user);
+      } catch (err) {
+        return done(err);
+      }
     }
   )
 );*/
