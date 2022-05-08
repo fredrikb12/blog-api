@@ -12,7 +12,6 @@ exports.posts_POST = [
     if (!errors.isEmpty()) {
       res.status(400).json({ errors: errors });
     } else {
-      console.log(req.body)
       const post = new Post({
         title: req.body.title,
         text: req.body.text,
