@@ -1,7 +1,7 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
-const genToken = require("./controllers/authController").genToken;
+const genToken = require("../controllers/authController").genToken;
 
 exports.jwtAuth = (req, res, next) => {
   const token = req.cookies.token;

@@ -3,9 +3,8 @@ const express = require("express");
 const path = require("path");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
-const passport = require("passport");
 
-const jwtAuth = require("./jwtAuth");
+const jwtAuth = require("./middlewares/jwtAuth");
 
 const indexRouter = require("./routes/index");
 const postsRouter = require("./routes/posts");
@@ -13,7 +12,7 @@ const authRouter = require("./routes/auth");
 
 const mongoose = require("mongoose");
 require("dotenv").config();
-require("./passport");
+require("./middlewares/passport");
 
 mongoose.connect(process.env.MONGODB_STRING, {
   useNewUrlParser: true,
@@ -24,10 +23,6 @@ const app = express();
 const db = mongoose.connection;
 
 db.on("error", console.error.bind(console, "MongoDB connection error:"));
-
-// view engine setup
-app.set("views", path.join(__dirname, "views"));
-app.set("view engine", "pug");
 
 app.use(logger("dev"));
 app.use(express.json());
