@@ -109,24 +109,19 @@ exports.posts_POST = [
       comments: [],
     }).save((err, post) => {
       if (err) return next(err);
+      const jsonRes = {
+        message: "Working?",
+        user: req._id,
+        post: post,
+      };
       if (jwtAuth.tokenNeedsUpdate(req, res, next)) {
         return res
           .cookie("token", genToken({ first_name: req.iss, _id: req._id }), {
             httpOnly: true,
           })
-          .json({
-            message: "Working?",
-            user: req._id,
-            cookieStatus: "Updated",
-            post: post,
-          });
+          .json({ ...jsonRes, cookieStatus: "Updated" });
       } else {
-        return res.json({
-          message: "Working?",
-          user: req._id,
-          cookieStatus: "Not updated",
-          post: post,
-        });
+        return res.json({ ...jsonRes, cookieStatus: "Not updated" });
       }
     });
   },
