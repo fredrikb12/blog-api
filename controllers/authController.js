@@ -108,6 +108,7 @@ exports.posts_POST = [
       published: req.pulished || false,
       comments: [],
     }).save((err, post) => {
+      if (err) return next(err);
       if (jwtAuth.tokenNeedsUpdate(req, res, next)) {
         return res
           .cookie("token", genToken({ first_name: req.iss, _id: req._id }), {
@@ -132,6 +133,8 @@ exports.posts_POST = [
 ];
 
 exports.posts_GET = function (req, res, next) {};
+
+exports.posts_postID_GET = function (req, res, next) {};
 
 const genToken = function (user) {
   return jwt.sign(
