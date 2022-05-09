@@ -6,6 +6,7 @@ const jwt = require("jsonwebtoken");
 const passport = require("passport");
 const jwtAuth = require("../jwtAuth");
 const Post = require("../models/post");
+const jwtRes = require("../helpers/jwtResponse");
 require("dotenv").config();
 
 exports.signup_POST = [
@@ -109,25 +110,37 @@ exports.posts_POST = [
       comments: [],
     }).save((err, post) => {
       if (err) return next(err);
-      const jsonRes = {
-        message: "Working?",
-        user: req._id,
-        post: post,
-      };
       if (jwtAuth.tokenNeedsUpdate(req, res, next)) {
         return res
-          .cookie("token", genToken({ first_name: req.iss, _id: req._id }), {
+          .cookie("token", genToken({ _id: req._id }), {
             httpOnly: true,
           })
-          .json({ ...jsonRes, cookieStatus: "Updated" });
+          .json(jwtRes.updated(req._id, { post }));
       } else {
-        return res.json({ ...jsonRes, cookieStatus: "Not updated" });
+        return res.json(jwtRes.notUpdated(req._id, { post }));
       }
     });
   },
 ];
 
-exports.posts_GET = function (req, res, next) {};
+exports.posts_GET = function (req, res, next) {
+  const query = req.query;
+  Post.find()
+    .sort({ createdAt: query.sort || "desc" })
+    .populate("author", "first_name last_name")
+    .exec(function (err, posts) {
+      if (err) return next(err);
+      else {
+        if (jwtAuth.tokenNeedsUpdate(req, res, next)) {
+          res
+            .cookie("token", genToken({ _id: req._id }), { httpOnly: true })
+            .json(jwtRes.updated(req._id, { posts }));
+        } else {
+          res.json(jwtRes.notUpdated(req._id, { posts }));
+        }
+      }
+    });
+};
 
 exports.posts_postID_GET = function (req, res, next) {};
 
@@ -138,7 +151,7 @@ const genToken = function (user) {
       _id: user._id,
     },
     process.env.JWT_SECRET,
-    { expiresIn: "10s" }
+    { expiresIn: "3600s" }
   );
 };
 
