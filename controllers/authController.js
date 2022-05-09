@@ -142,7 +142,17 @@ exports.posts_GET = function (req, res, next) {
     });
 };
 
-exports.posts_postID_GET = function (req, res, next) {};
+exports.posts_postId_GET = function (req, res, next) {
+  res.send("GET Not Implemented");
+};
+
+exports.posts_postId_PUT = function (req, res, next) {
+  res.send("PUT Not Implemented");
+};
+
+exports.posts_postId_DELETE = function (req, res, next) {
+  res.send("DELETE Not Implemented");
+};
 
 const genToken = function (user) {
   return jwt.sign(

@@ -11,6 +11,10 @@ router.post("/posts", authController.posts_POST);
 
 router.get("/posts", authController.posts_GET);
 
-router.get("/posts/postId", authController.posts_postID_GET);
+router.get("/posts/:postId", authController.posts_postId_GET);
+
+router.put("/posts/:postId", authController.posts_postId_PUT);
+
+router.delete("/posts/:postId", authController.posts_postId_DELETE);
 
 module.exports = router;
