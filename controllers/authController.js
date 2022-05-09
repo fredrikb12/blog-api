@@ -5,6 +5,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const passport = require("passport");
 const jwtAuth = require("../jwtAuth");
+const Post = require("../models/post");
 require("dotenv").config();
 
 exports.signup_POST = [
@@ -97,21 +98,40 @@ exports.signin_POST = (req, res, next) => {
   })(req, res, next);
 };
 
-exports.posts_POST = (req, res, next) => {
-  if (jwtAuth.tokenNeedsUpdate(req, res, next)) {
-    return res
-      .cookie("token", genToken({ first_name: req.iss, _id: req._id }), {
-        httpOnly: true,
-      })
-      .json({ message: "Working?", user: req._id, cookieStatus: "Updated" });
-  } else {
-    res.json({
-      message: "Working?",
-      user: req._id,
-      cookieStatus: "Not updated",
+exports.posts_POST = [
+  body("title").escape(),
+  (req, res, next) => {
+    const post = new Post({
+      title: req.body.title,
+      text: req.body.text,
+      author: req._id,
+      published: req.pulished || false,
+      comments: [],
+    }).save((err, post) => {
+      if (jwtAuth.tokenNeedsUpdate(req, res, next)) {
+        return res
+          .cookie("token", genToken({ first_name: req.iss, _id: req._id }), {
+            httpOnly: true,
+          })
+          .json({
+            message: "Working?",
+            user: req._id,
+            cookieStatus: "Updated",
+            post: post,
+          });
+      } else {
+        return res.json({
+          message: "Working?",
+          user: req._id,
+          cookieStatus: "Not updated",
+          post: post,
+        });
+      }
     });
-  }
-};
+  },
+];
+
+exports.posts_GET = function (req, res, next) {};
 
 const genToken = function (user) {
   return jwt.sign(
