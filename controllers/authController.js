@@ -143,7 +143,20 @@ exports.posts_GET = function (req, res, next) {
 };
 
 exports.posts_postId_GET = function (req, res, next) {
-  res.send("GET Not Implemented");
+  Post.findById(req.params.postId)
+    .populate("author", "first_name last_name")
+    .exec(function (err, post) {
+      if (err) return next(err);
+      else {
+        if (jwtAuth.tokenNeedsUpdate(req, res, next)) {
+          res
+            .cookie("token", genToken({ _id: req._id }), { httpOnly: true })
+            .json(jwtRes.updated(req._id, { post }));
+        } else {
+          res.json(jwtRes.notUpdated(req._id, { post }));
+        }
+      }
+    });
 };
 
 exports.posts_postId_PUT = function (req, res, next) {
