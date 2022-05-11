@@ -20,11 +20,30 @@ mongoose.connect(process.env.MONGODB_STRING, {
   useUnifiedTopology: true,
 });
 
+const origins = [
+  "http://localhost:3000",
+  "http://localhost:3001",
+  "https://guarded-mesa-79248.herokuapp.com/",
+];
+
 const app = express();
 const db = mongoose.connection;
 
 db.on("error", console.error.bind(console, "MongoDB connection error:"));
-app.use(cors());
+app.use(
+  cors({
+    credentials: true,
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
+      if (origins.indexOf(origin) === -1) {
+        const msg =
+          "The CORS policy for this site does not allow access from the specified origin.";
+        return callback(new Error(msg), false);
+      }
+      return callback(null, true);
+    },
+  })
+);
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
