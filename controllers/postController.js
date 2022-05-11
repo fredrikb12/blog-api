@@ -26,7 +26,7 @@ exports.posts_POST = [
 ];
 
 exports.posts_GET = (req, res, next) => {
-  Post.find({ published: false }, "title text updatedAt")
+  Post.find({ published: true }, "title text updatedAt")
     .sort({ createdAt: "desc" })
     .populate("comments")
     .populate("author", "first_name last_name")
