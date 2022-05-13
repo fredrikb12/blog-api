@@ -22,6 +22,7 @@ mongoose.connect(process.env.MONGODB_STRING, {
 
 const origins = [
   "http://localhost:3000",
+  "http://localhost:3001/sign-in",
   "http://localhost:3001",
   "https://guarded-mesa-79248.herokuapp.com/",
 ];
