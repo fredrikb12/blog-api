@@ -117,8 +117,8 @@ exports.posts_POST = [
       res.status(400).json({ errors: errors });
     }
     const post = new Post({
-      title: req.body.title.replace(/&#x27;/, "'"),
-      text: req.body.text.replace(/&#x27;/, "'"),
+      title: req.body.title.replace(/&#x27;/g, "'"),
+      text: req.body.text.replace(/&#x27;/g, "'"),
       author: req._id,
       published: req.pulished || false,
       comments: [],
@@ -186,8 +186,8 @@ exports.posts_postId_PUT = [
     }
     const { title, text, published, comments, author } = req.body;
     const fields = {
-      title: title ? title.replace(/&#x27;/, "'") : "",
-      text: text ? text.replace(/&#x27;/, "'") : "",
+      title: title ? title.replace(/&#x27;/g, "'") : "",
+      text: text ? text.replace(/&#x27;/g, "'") : "",
       published,
       comments,
     };
