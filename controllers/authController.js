@@ -85,6 +85,7 @@ exports.signin_POST = (req, res, next) => {
       return res.status(400).json({
         message: "Something is not right",
         user: user,
+        errors: ["Incorrect username or password"],
       });
     } else {
       req.login(user, { session: false }, (err) => {
@@ -92,8 +93,15 @@ exports.signin_POST = (req, res, next) => {
           return next(err);
         }
         return res
+          .status(200)
           .cookie("token", genToken(user), { httpOnly: true })
-          .json({ message: "Login successful!", user: user._id });
+          .json(
+            jwtRes.updated(user, {
+              message: "Login successful!",
+              user: user._id,
+              code: 200,
+            })
+          );
       });
     }
   })(req, res, next);
