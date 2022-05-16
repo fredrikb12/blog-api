@@ -109,10 +109,16 @@ exports.signin_POST = (req, res, next) => {
 
 exports.posts_POST = [
   body("title").escape(),
+  body("text").escape(),
+  body("published").escape(),
   (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.status(400).json({ errors: errors });
+    }
     const post = new Post({
-      title: req.body.title,
-      text: req.body.text,
+      title: req.body.title.replace(/&#x27;/, "'"),
+      text: req.body.text.replace(/&#x27;/, "'"),
       author: req._id,
       published: req.pulished || false,
       comments: [],
@@ -167,9 +173,51 @@ exports.posts_postId_GET = function (req, res, next) {
     });
 };
 
-exports.posts_postId_PUT = function (req, res, next) {
-  res.send("PUT Not Implemented");
-};
+exports.posts_postId_PUT = [
+  body("text").escape(),
+  body("title").escape(),
+  body("published").escape(),
+  body("comments").escape(),
+  body("author").escape(),
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors });
+    }
+    const { title, text, published, comments, author } = req.body;
+    const fields = {
+      title: title ? title.replace(/&#x27;/, "'") : "",
+      text: text ? text.replace(/&#x27;/, "'") : "",
+      published,
+      comments,
+    };
+
+    fields.published = fields.published === "true" ? true : false;
+
+    const definedFields = Object.keys(fields).filter(
+      (field) => fields[field] !== "" && fields[field] !== undefined
+    );
+
+    const valuesToUpdate = definedFields.reduce((obj, field) => {
+      return { ...obj, [field]: fields[field] };
+    }, {});
+
+    Post.findByIdAndUpdate(
+      req.params.postId,
+      { ...valuesToUpdate },
+      {},
+      function (err, post) {
+        if (err) return next(err);
+        return res.status(200).json(
+          jwtRes.notUpdated(req._id, {
+            post: { ...post["_doc"] },
+            code: 200,
+          })
+        );
+      }
+    );
+  },
+];
 
 exports.posts_postId_DELETE = function (req, res, next) {
   res.send("DELETE Not Implemented");

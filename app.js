@@ -30,6 +30,8 @@ const origins = [
 const app = express();
 const db = mongoose.connection;
 
+app.set("view engine", "pug");
+
 db.on("error", console.error.bind(console, "MongoDB connection error:"));
 app.use(
   cors({
@@ -69,7 +71,7 @@ app.use(function (err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
-  res.render("error");
+  res.send("error");
 });
 
 module.exports = app;
