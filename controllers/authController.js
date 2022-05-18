@@ -210,6 +210,7 @@ exports.posts_postId_PUT = [
         if (err) return next(err);
         return res.status(200).json(
           jwtRes.notUpdated(req._id, {
+            message: "Post updated",
             post: { ...post["_doc"] },
             code: 200,
           })
@@ -220,7 +221,23 @@ exports.posts_postId_PUT = [
 ];
 
 exports.posts_postId_DELETE = function (req, res, next) {
-  res.send("DELETE Not Implemented");
+  Post.findById(req.body.postId).exec(function (err, results) {
+    if (err) return next(err);
+    if (results == null) {
+      res.redirect("/auth/posts");
+      return;
+    } else {
+      Post.findByIdAndRemove(req.body.postId, function deletePost(err) {
+        if (err) return next(err);
+        res.status(200).json(
+          jwtRes.notUpdated(req._id, {
+            message: "Post deleted",
+            code: 200,
+          })
+        );
+      });
+    }
+  });
 };
 
 const genToken = function (user) {
