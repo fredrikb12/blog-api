@@ -148,9 +148,9 @@ exports.posts_GET = function (req, res, next) {
         if (jwtAuth.tokenNeedsUpdate(req, res, next)) {
           res
             .cookie("token", genToken({ _id: req._id }), { httpOnly: true })
-            .json(jwtRes.updated(req._id, { posts }));
+            .json(jwtRes.updated(req._id, { posts, status: 200 }));
         } else {
-          res.json(jwtRes.notUpdated(req._id, { posts }));
+          res.json(jwtRes.notUpdated(req._id, { posts, status: 200 }));
         }
       }
     });
@@ -165,9 +165,9 @@ exports.posts_postId_GET = function (req, res, next) {
         if (jwtAuth.tokenNeedsUpdate(req, res, next)) {
           res
             .cookie("token", genToken({ _id: req._id }), { httpOnly: true })
-            .json(jwtRes.updated(req._id, { post }));
+            .json(jwtRes.updated(req._id, { post, status: 200 }));
         } else {
-          res.json(jwtRes.notUpdated(req._id, { post }));
+          res.json(jwtRes.notUpdated(req._id, { post, status: 200 }));
         }
       }
     });
