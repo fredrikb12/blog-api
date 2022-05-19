@@ -24,6 +24,7 @@ const origins = [
   "http://localhost:3000",
   "http://localhost:3001/sign-in",
   "http://localhost:3001",
+  "http://localhost:3002",
   "https://guarded-mesa-79248.herokuapp.com/",
 ];
 
