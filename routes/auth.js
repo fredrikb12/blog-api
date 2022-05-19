@@ -17,4 +17,8 @@ router.put("/posts/:postId", authController.posts_postId_PUT);
 
 router.delete("/posts/:postId", authController.posts_postId_DELETE);
 
+router.put("/comments/:commentId", authController.comments_commentId_PUT);
+
+router.delete("/comments/:commentId", authController.comments_commentId_DELETE);
+
 module.exports = router;

@@ -120,7 +120,7 @@ exports.posts_POST = [
       title: req.body.title.replace(/&#x27;/g, "'"),
       text: req.body.text.replace(/&#x27;/g, "'"),
       author: req._id,
-      published: req.pulished || false,
+      published: req.body.published || false,
       comments: [],
     }).save((err, post) => {
       if (err) return next(err);
@@ -240,6 +240,14 @@ exports.posts_postId_DELETE = function (req, res, next) {
     }
   });
 };
+
+exports.comments_commentId_PUT = function(req, res, next) {
+
+}
+
+exports.comments_commentId_DELETE = function(req, res, next) {
+
+}
 
 const genToken = function (user) {
   return jwt.sign(
