@@ -159,6 +159,7 @@ exports.posts_GET = function (req, res, next) {
 exports.posts_postId_GET = function (req, res, next) {
   Post.findById(req.params.postId)
     .populate("author", "first_name last_name")
+    .populate("comments")
     .exec(function (err, post) {
       if (err) return next(err);
       else {
