@@ -7,6 +7,7 @@ const passport = require("passport");
 const jwtAuth = require("../middlewares/jwtAuth");
 const Post = require("../models/post");
 const jwtRes = require("../helpers/jwtResponse");
+const Comment = require("../models/comment");
 require("dotenv").config();
 
 exports.signup_POST = [
@@ -241,13 +242,40 @@ exports.posts_postId_DELETE = function (req, res, next) {
   });
 };
 
-exports.comments_commentId_PUT = function(req, res, next) {
+exports.comments_commentId_PUT = [
+  body("text").escape(),
+  body("author").escape(),
+  body("commentId").escape(),
+  (req, res, next) => {
+    Comment.findById(req.body.commentId).exec(function (err, results) {
+      if (err) return next(err);
+      if (results == null) {
+        return res.redirect("/auth/posts");
+      } else {
+        Comment.findByIdAndUpdate(
+          req.body.commentId,
+          {
+            text: req.body.text,
+            author: req.body.author,
+          },
+          {},
+          function (err, comment) {
+            if (err) return next(err);
+            return res.status(200).json(
+              jwtRes.notUpdated(req._id, {
+                message: "Comment updated",
+                comment: { text: req.body.text, author: req.body.author },
+                code: 200,
+              })
+            );
+          }
+        );
+      }
+    });
+  },
+];
 
-}
-
-exports.comments_commentId_DELETE = function(req, res, next) {
-
-}
+exports.comments_commentId_DELETE = function (req, res, next) {};
 
 const genToken = function (user) {
   return jwt.sign(
