@@ -19,7 +19,7 @@ exports.posts_POST = [
         comments: [],
       }).save((err) => {
         if (err) return next(err);
-        return res.json({ status: 200, message: "Post submitted" });
+        return res.status(200).json({ status: 200, message: "Post submitted" });
       });
     }
   },
@@ -34,13 +34,22 @@ exports.posts_GET = (req, res, next) => {
       if (err) {
         return next(err);
       } else {
-        return res.json(results);
+        return res.status(200).json(results);
       }
     });
 };
 
 exports.posts_postId_GET = (req, res, next) => {
-  res.send(`NOT IMPLEMENTED: /posts/${req.params.postId} GET`);
+  Post.findById(req.params.postId, "title text updatedAt", { published: true })
+    .populate("author", "first_name last_name")
+    .populate("comments")
+    .exec(function (err, post) {
+      console.log(post);
+      if (err) return next(err);
+      else {
+        return res.status(200).json(post);
+      }
+    });
 };
 
 exports.posts_postId_PUT = (req, res, next) => {
