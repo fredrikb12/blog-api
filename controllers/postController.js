@@ -26,7 +26,7 @@ exports.posts_POST = [
 ];
 
 exports.posts_GET = (req, res, next) => {
-  Post.find({ published: true }, "title text updatedAt")
+  Post.find({ published: true }, "title text updatedAt createdAt")
     .sort({ createdAt: "desc" })
     .populate("comments")
     .populate("author", "first_name last_name")
@@ -40,13 +40,15 @@ exports.posts_GET = (req, res, next) => {
 };
 
 exports.posts_postId_GET = (req, res, next) => {
-  Post.findById(req.params.postId, "title text updatedAt", { published: true })
+  Post.findById(req.params.postId, "title text updatedAt createdAt", {
+    published: true,
+  })
     .populate("author", "first_name last_name")
     .populate("comments")
     .exec(function (err, post) {
-      console.log(post);
       if (err) return next(err);
       else {
+        console.log("returning", post);
         return res.status(200).json(post);
       }
     });
@@ -60,9 +62,49 @@ exports.posts_postId_DELETE = (req, res, next) => {
   res.send(`NOT IMPLEMENTED: /posts/${req.params.postId} DELETE`);
 };
 
-exports.posts_postId_comments_POST = (req, res, next) => {
-  res.send(`NOT IMPLEMENTED: /posts/${req.params.postId}/comments POST`);
-};
+exports.posts_postId_comments_POST = [
+  body("author").escape(),
+  body("text").escape(),
+  (req, res, next) => {
+    const text = req.body.text.replace(/&#x27;/g, "'");
+    const author = req.body.author.replace(/&#x27;/g, "'");
+
+    const comment = new Comment({
+      author,
+      text,
+    });
+    console.log("comment:", comment);
+    async.waterfall(
+      [
+        function (callback) {
+          comment.save((err) => {
+            if (err) return next(err);
+            else callback(null, comment._id);
+          });
+        },
+        function (id, callback) {
+          Post.findByIdAndUpdate(req.params.postId, {
+            $push: { comments: id },
+          }).exec(function (err, post) {
+            if (err) return next(err);
+            callback(null, post);
+          });
+        },
+      ],
+      function (err, result) {
+        if (err) return next(err);
+        return res
+          .status(200)
+          .json({
+            post: result,
+            message: "Comments updated",
+            status: 200,
+            id: comment._id,
+          });
+      }
+    );
+  },
+];
 
 exports.posts_postId_comments_GET = (req, res, next) => {
   res.send(`NOT IMPLEMENTED: /posts/${req.params.postId}/comments GET`);
