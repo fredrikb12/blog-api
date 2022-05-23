@@ -222,25 +222,28 @@ exports.posts_postId_PUT = [
   },
 ];
 
-exports.posts_postId_DELETE = function (req, res, next) {
-  Post.findById(req.body.postId).exec(function (err, results) {
-    if (err) return next(err);
-    if (results == null) {
-      res.redirect("/auth/posts");
-      return;
-    } else {
-      Post.findByIdAndRemove(req.body.postId, function deletePost(err) {
-        if (err) return next(err);
-        res.status(200).json(
-          jwtRes.notUpdated(req._id, {
-            message: "Post deleted",
-            code: 200,
-          })
-        );
-      });
-    }
-  });
-};
+exports.posts_postId_DELETE = [
+  body("postId").escape(),
+  (req, res, next) => {
+    Post.findById(req.body.postId).exec(function (err, results) {
+      if (err) return next(err);
+      if (results == null) {
+        res.redirect("/auth/posts");
+        return;
+      } else {
+        Post.findByIdAndRemove(req.body.postId, {}, function deletePost(err) {
+          if (err) return next(err);
+          res.status(200).json(
+            jwtRes.notUpdated(req._id, {
+              message: "Post deleted",
+              code: 200,
+            })
+          );
+        });
+      }
+    });
+  },
+];
 
 exports.comments_commentId_PUT = [
   body("text").escape(),
@@ -275,7 +278,37 @@ exports.comments_commentId_PUT = [
   },
 ];
 
-exports.comments_commentId_DELETE = function (req, res, next) {};
+exports.comments_commentId_DELETE = [
+  body("commentId").escape(),
+  (req, res, next) => {
+    Comment.findById(req.body.commentId).exec(function (err, results) {
+      if (err) return next(err);
+      if (results == null) {
+        return res.status(404).json(
+          jwtRes.notUpdated(req._id, {
+            message: "Comment not found",
+            comment: req.body.commentId,
+            code: 404,
+          })
+        );
+      } else {
+        Comment.findByIdAndRemove(
+          req.body.commentId,
+          {},
+          function deleteComment(err, comment) {
+            if (err) return next(err);
+            res.status(200).json(
+              jwtRes.notUpdated(req._id, {
+                message: "Comment deleted",
+                code: 200,
+              })
+            );
+          }
+        );
+      }
+    });
+  },
+];
 
 const genToken = function (user) {
   return jwt.sign(
