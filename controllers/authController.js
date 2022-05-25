@@ -186,12 +186,11 @@ exports.posts_postId_PUT = [
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors });
     }
-    const { title, text, published, comments, author } = req.body;
+    const { title, text, published, author } = req.body;
     const fields = {
       title: title ? title.replace(/&#x27;/g, "'") : "",
       text: text ? text.replace(/&#x27;/g, "'") : "",
       published,
-      comments,
     };
 
     fields.published = fields.published === "true" ? true : false;
@@ -253,13 +252,13 @@ exports.comments_commentId_PUT = [
     Comment.findById(req.body.commentId).exec(function (err, results) {
       if (err) return next(err);
       if (results == null) {
-        return res.redirect("/auth/posts");
+        return res.status(404).redirect("/auth/posts");
       } else {
         Comment.findByIdAndUpdate(
           req.body.commentId,
           {
-            text: req.body.text,
-            author: req.body.author,
+            text: req.body.text.replace(/&#x27;/g, "'"),
+            author: req.body.author.replace(/&#x27;/g, "'"),
           },
           {},
           function (err, comment) {
@@ -267,7 +266,10 @@ exports.comments_commentId_PUT = [
             return res.status(200).json(
               jwtRes.notUpdated(req._id, {
                 message: "Comment updated",
-                comment: { text: req.body.text, author: req.body.author },
+                comment: {
+                  text: req.body.text.replace(/&#x27;/g, "'"),
+                  author: req.body.author.replace(/&#x27;/g, "'"),
+                },
                 code: 200,
               })
             );
