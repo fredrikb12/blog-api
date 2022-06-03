@@ -109,13 +109,25 @@ exports.signin_POST = (req, res, next) => {
 };
 
 exports.posts_POST = [
-  body("title").escape(),
-  body("text").escape(),
-  body("published").escape(),
+  body("title", "Title is required")
+    .custom((title) => {
+      if (title === "") return Promise.reject("Title is required");
+      else return Promise.resolve(title);
+    })
+    .exists()
+    .escape(),
+  body("text", "Text is required")
+    .custom((text) => {
+      if (text === "") return Promise.reject("Text is required");
+      else return Promise.resolve(text);
+    })
+    .exists()
+    .escape(),
+  body("published").exists().escape(),
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      res.status(400).json({ errors: errors });
+      return res.status(400).json({ errors: errors });
     }
     const post = new Post({
       title: req.body.title.replace(/&#x27;/g, "'"),
@@ -130,9 +142,21 @@ exports.posts_POST = [
           .cookie("token", genToken({ _id: req._id }), {
             httpOnly: true,
           })
-          .json(jwtRes.updated(req._id, { post }));
+          .json(
+            jwtRes.updated(req._id, {
+              post,
+              message: "Post submitted",
+              status: 200,
+            })
+          );
       } else {
-        return res.json(jwtRes.notUpdated(req._id, { post }));
+        return res.json(
+          jwtRes.notUpdated(req._id, {
+            post,
+            message: "Post submitted",
+            status: 200,
+          })
+        );
       }
     });
   },
